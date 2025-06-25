@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recepies Indian Food</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" 
+    rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <!-- memberikan style pada tag, id, dan class tertentu -->
+    <style>
+        div a{
+            text-decoration: none;
+        }
+        div p{
+            margin: 0;
+            line-height: 1.5;
+        }
+        div #img-food{
+            border-radius: 1000px;
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            margin-right: 10px;
+        }
+
+        #score{
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        body{
+            overflow-x: hidden;
+        }
+    </style>
+</head>
+<body style="font-family:Helvetica; background-color: #F2F2F2;">
+    <header class="w-100 p-2" style="background-color: #E55050; color: #F2F2F2;">
+        <div>
+            <h3>Recepies Indian Food</h3>
+        </div>
+    </header>
+    <main>
+        <div class="container mt-5 d-flex flex-column justify-content-start align-items-center gap-4">
+            <div class="text-center">
+                <h2>Indian Food</h2>
+            </div>
+            <div class="w-100">
+                <div class="col-12 col-md-6 mx-auto">
+                    <form action="#" method="GET">
+                        <div class="d-flex rounded overflow-hidden shadow-lg" style="border: 1px solid black; height: 50px;" id="form">
+                            <input type="text" class="form-control border-0 rounded-0" placeholder="Search name food" name="query" id="cari" style="background-color: #EEEDEB;">
+                            
+                            <button class="btn rounded-0" id="search" style="background-color: #FFFDF6" type="submit"><i class="fa-solid fa-magnifying-glass" id="textblue"></i></button>
+                        </div>
+                    </form>
+                </div>
+            </div>   
+         </div>
+    </main>
+    <!-- tag yang digunakan untuk menampung hasil query -->
+    <div id="search_result" class="mt-5"></div>
+
+
+
+    <script>
+        // Jquery untuk mengakses data dalam server
+        $(document).ready(function(){
+            // mngakses id jika menerima action click
+            $("#search").click(function(e){
+                e.preventDefault();
+                // mengambil value dari id "cari" berupa form
+                var cari = $("#cari").val();
+                // gunakan ajax untuk mengambil data dan mengirim data dari server
+                $.ajax({
+                    // mengirim data dari url berupa value berdasarkan id "cari"
+                    url: "/search?q=" + encodeURIComponent(cari), 
+                    // data yang diambil berupa json
+                    dataType: "json", 
+                    // event ketika success proses merespon data atau mengambil data
+                    success: function(data){
+                        // beri validari jika value setealh query panjangnya 0
+                         if (data.length === 0) {
+                            // memberi pesan eror langsung pada html dengan id "search_result" 
+                            $('#search_result').html('<p class="text-center">No results found.</p>');
+                            return;
+                         }
+
+                        //  isialisasikan variabel untuk menampung data yang telah diambil dari server
+                         let text_html = "";
+                        //  proses mengiterasikan setiap data yang telah diambil atau diterima
+                            Object.values(data).forEach(function(item){
+                                // menambahkan tag beserta data ke variabel yang telah diinnisialisasikan
+                                text_html += `
+                                <div class="col-12 mb-3 px-3 card" style="font-family: arial">
+                                    <div class="row g-0">
+                                        <div class="col-md-10">
+                                            <div class="card-body">
+                                                <div class="d-flex align-items-center">
+                                                    <img src="${item["image-url"] ? item["image-url"] : '#'}" id="img-food" class="img-fluid me-3" style="max-width: 150px;" alt="Recipe Image">
+                                                    <h5 class="text-primary"><a href="${item['URL'] || '#'}">${item['TranslatedRecipeName']}</a></h5>
+                                                </div>
+                                                <div>
+                                                    <p id="score">Score: ${item['score']}</p>
+                                                    <p>Dish from: ${item['Cuisine']}</p>
+                                                    <p>Ingredients: ${item['TranslatedIngredients']}</p>
+                                                    <p>Total time to cook: ${item["TotalTimeInMins"]} minutes</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                `;
+                            });
+                            // proses menambahkan elemen html ke id "search_result"
+                            $("#search_result").html(text_html);
+                    },
+                    // eror handling jika proses mengirim atau menerima data terdapat kesalahan
+                    error: function(){
+                        alert("Please Insert your comand");
+                    }
+                });
+            });
+
+            // proses memberikan style ketika form dengan id "cari" sedang diisi atau focus
+            $("#cari").focus(function(){
+                // beri style css berupa border sebesar 1px dengan warna biru
+                $('#form').css("border", "1px solid blue");    
+            })
+        });
+
+
+    </script>
+</body>
+</html>
